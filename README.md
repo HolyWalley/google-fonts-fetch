@@ -16,9 +16,35 @@ This package allows you to download Google Fonts and store them in memory instea
 
 ## Installation
 
+### From GitHub Release (Recommended)
+
+```bash
+npm install https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+```
+
+Or with yarn:
+```bash
+yarn add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+```
+
+Or with pnpm:
+```bash
+pnpm add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+```
+
+### From GitHub Repository (Latest)
+
+```bash
+npm install HolyWalley/google-fonts-fetch
+```
+
+### From npm Registry (Original Package)
+
 ```bash
 npm install @frontlabsofficial/google-fonts-fetch
 ```
+
+> **Note**: The npm registry version is the original filesystem-based version. Use the GitHub release for Cloudflare Workers compatibility.
 
 ## Usage
 
@@ -160,6 +186,45 @@ Clear all files from memory.
   }
 }
 ```
+
+## Release Process
+
+### For Maintainers
+
+To create a new release of this package:
+
+1. **Make your changes** and ensure all tests pass:
+   ```bash
+   pnpm run typecheck
+   pnpm run lint
+   ```
+
+2. **Build the package**:
+   ```bash
+   pnpm run build
+   ```
+
+3. **Create a package tarball**:
+   ```bash
+   pnpm pack
+   ```
+   This creates a `.tgz` file (e.g., `frontlabsofficial-google-fonts-fetch-1.0.3.tgz`)
+
+4. **Create a GitHub release** with the tarball:
+   ```bash
+   gh release create v1.0.4 frontlabsofficial-google-fonts-fetch-1.0.4.tgz \
+     --title "v1.0.4 - Your Release Title" \
+     --notes "Release notes here"
+   ```
+
+5. **Update installation instructions** in README.md with the new version number
+
+### Why This Process?
+
+- The `dist` folder is in `.gitignore` and not committed to the repository
+- The `.tgz` file contains the built package that users actually need
+- GitHub releases provide a clean way to distribute built packages
+- Users can install directly from GitHub releases without needing to build locally
 
 ## License
 
