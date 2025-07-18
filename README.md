@@ -220,32 +220,50 @@ Clear all files from memory.
 
 To create a new release of this package:
 
+1. **Update the version** in `package.json`:
+   ```json
+   {
+     "version": "1.0.5"
+   }
+   ```
+
+2. **Run the release script** (this will run tests, lint, build, and pack):
+   ```bash
+   pnpm run release:github
+   ```
+   This creates a `.tgz` file (e.g., `frontlabsofficial-google-fonts-fetch-1.0.5.tgz`)
+
+3. **Create a GitHub release** with the tarball:
+   ```bash
+   gh release create v[NEW_VERSION] frontlabsofficial-google-fonts-fetch-[NEW_VERSION].tgz \
+     --title "v[NEW_VERSION] - Your Release Title" \
+     --notes "Release notes here"
+   ```
+   Replace `[NEW_VERSION]` with the actual version number (e.g., `1.0.5`)
+
+4. **Users can find the new release** on the [releases page](https://github.com/HolyWalley/google-fonts-fetch/releases)
+
+### Alternative: Manual Steps
+
+If you prefer to run steps manually:
+
 1. **Make your changes** and ensure all tests pass:
    ```bash
    pnpm run typecheck
    pnpm run lint
    ```
 
-2. **Build the package**:
+2. **Update version** in `package.json`
+
+3. **Build the package**:
    ```bash
    pnpm run build
    ```
 
-3. **Create a package tarball**:
+4. **Create a package tarball**:
    ```bash
    pnpm pack
    ```
-   This creates a `.tgz` file (e.g., `frontlabsofficial-google-fonts-fetch-1.0.3.tgz`)
-
-4. **Create a GitHub release** with the tarball:
-   ```bash
-   gh release create v[NEW_VERSION] frontlabsofficial-google-fonts-fetch-1.0.3.tgz \
-     --title "v[NEW_VERSION] - Your Release Title" \
-     --notes "Release notes here"
-   ```
-   Replace `[NEW_VERSION]` with the actual version number (e.g., `1.0.5`)
-
-5. **Users can find the new release** on the [releases page](https://github.com/HolyWalley/google-fonts-fetch/releases)
 
 ### Why This Process?
 

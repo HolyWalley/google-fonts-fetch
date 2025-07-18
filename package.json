@@ -1,7 +1,7 @@
 {
   "name": "@frontlabsofficial/google-fonts-fetch",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "packageManager": "pnpm@8.15.3",
   "description": "A lightweight utility for seamlessly integrating Google Fonts into web projects, optimizing web performance, and enhancing user experience.",
   "author": "ErikPham <phucpm.it@gmail.com>",
@@ -50,6 +50,7 @@
     "lint": "eslint .",
     "prepublishOnly": "nr build",
     "release": "bumpp",
+    "release:github": "pnpm run typecheck && pnpm run lint && pnpm run build && pnpm pack",
     "ci:publish": "npm publish --access public --no-git-check",
     "test": "vitest",
     "typecheck": "tsc --noEmit",
