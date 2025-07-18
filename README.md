@@ -1,60 +1,165 @@
-## @frontlabsofficial/google-fonts-fetch
+# @frontlabsofficial/google-fonts-fetch
 
-### Description
-`@frontlabsofficial/google-fonts-fetch` is a lightweight and efficient package designed to simplify the process of self-host Google Fonts. By leveraging this package, developers can effortlessly download Google Fonts to their local environment, enabling seamless integration and improved website performance.
+A lightweight utility for downloading Google Fonts to memory for use in Cloudflare Workers and other serverless environments.
 
-## Motivation
-While working on improving PageSpeed, I discovered the significant enhancements brought by Google Fonts v2. Everything seemed to become smoother and lighter, from font sizes to the ability to reuse various font weights. Despite my efforts to find a suitable API or package for immediate use, I came up empty-handed.
+## Description
 
-For instance, take the font Roboto. The font sizes of version 1 compared to version 2 were ~130kb and ~11kb respectively. Different font weights could be utilized within a single file. The savings were substantial, sparking a strong inspiration within me to create this package. It's evident that this project has the potential to make a substantial impact on metrics such as FCP, LCP, and overall PageSpeed scores, significantly benefiting your website.
+This package allows you to download Google Fonts and store them in memory instead of the filesystem, making it perfect for serverless environments like Cloudflare Workers. All fonts are fetched from Google Fonts API and stored using an in-memory filesystem (memfs).
 
-This project aims to harness the efficiencies of Google Fonts v2, offering a streamlined solution for integrating fonts into web projects. By optimizing font usage, we can enhance website performance and user experience, ultimately leading to improved rankings and user engagement.
+## Features
 
-### Features
-- **Effortless Font Download**: Quickly fetch and download Google Fonts to your local project directory with minimal configuration.
-
-- **Customizable Options**: Customize font selection, variants, and subsets to tailor the download to your specific project needs.
-
-- **Optimized Performance**: Reduce page load times and enhance website performance by serving fonts directly from your server.
+- **Memory-based storage**: Fonts are stored in memory, perfect for serverless environments
+- **Cloudflare Workers compatible**: No Node.js dependencies, uses Web APIs
+- **Multiple download options**: Download single fonts, multiple fonts, or all available fonts
+- **Font access methods**: Retrieve fonts from memory for serving or processing
+- **TypeScript support**: Full TypeScript support with proper type definitions
 
 ## Installation
-  ```bash
-  npm install @frontlabsofficial/google-fonts-fetch
-  ```
+
+```bash
+npm install @frontlabsofficial/google-fonts-fetch
+```
 
 ## Usage
-### Create Google Fonts Fetch
-```js
+
+### Basic Setup
+
+```javascript
 import { createGoogleFontsFetch } from '@frontlabsofficial/google-fonts-fetch'
-const fetch = createGoogleFontsFetch()
-```
-### Download single font
-```js
-fetch.single('Roboto')
-fetch.single('Roboto', { weight: [400] })
+
+const fontFetch = createGoogleFontsFetch({
+  outDir: '/fonts',
+  base: 'https://your-domain.com/fonts',
+  metadata: {
+    name: 'fonts-metadata.json'
+  }
+})
 ```
 
-### Download multiple fonts
-```js
-fetch.multiple([
+### Download a Single Font
+
+```javascript
+// Download default weights of Roboto
+const fonts = await fontFetch.single('Roboto')
+
+// Download specific weights
+const fonts = await fontFetch.single('Roboto', {
+  weight: [400, 700],
+  italic: true
+})
+```
+
+### Download Multiple Fonts
+
+```javascript
+const fonts = await fontFetch.multiple([
   { name: 'Roboto' },
-  { name: 'Open Sans' },
-])
-
-fetch.multiple([
-  { name: 'Roboto', weight: [400] },
-  { name: 'Open Sans', weight: [400, 500] },
+  { name: 'Open Sans', options: { weight: [400, 600] } }
 ])
 ```
 
-### Download all fonts
-```js
-fetch.all()
+### Download All Available Fonts
+
+```javascript
+const result = await fontFetch.all({ weight: [400] })
+console.log(`Downloaded ${result.success.length} fonts`)
+console.log(`Failed to download ${result.errors.length} fonts`)
 ```
 
-## Contributing
+### Access Downloaded Fonts
 
-Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+```javascript
+// Get a specific font file
+const fontFile = await fontFetch.getFileFromMemory('/fonts/roboto/1.woff2')
+
+// Get all downloaded files
+const allFiles = fontFetch.getAllFiles()
+console.log(Object.keys(allFiles)) // Lists all file paths
+
+// Clear all fonts from memory
+fontFetch.clearMemory()
+```
+
+## Cloudflare Workers Example
+
+```javascript
+import { createGoogleFontsFetch } from '@frontlabsofficial/google-fonts-fetch'
+
+export default {
+  async fetch(request, env, ctx) {
+    const fontFetch = createGoogleFontsFetch({
+      outDir: '/fonts',
+      base: 'https://your-worker.your-domain.workers.dev/fonts'
+    })
+
+    // Download fonts
+    await fontFetch.single('Roboto', { weight: [400, 700] })
+
+    // Serve font files
+    const url = new URL(request.url)
+    if (url.pathname.startsWith('/fonts/')) {
+      try {
+        const fontData = await fontFetch.getFileFromMemory(url.pathname)
+        return new Response(fontData, {
+          headers: {
+            'Content-Type': 'font/woff2',
+            'Cache-Control': 'public, max-age=31536000'
+          }
+        })
+      } catch (error) {
+        return new Response('Font not found', { status: 404 })
+      }
+    }
+
+    return new Response('Hello World!')
+  }
+}
+```
+
+## API Reference
+
+### `createGoogleFontsFetch(options)`
+
+Creates a new Google Fonts fetch instance.
+
+**Options:**
+- `outDir`: Base directory for font storage (default: `./fonts`)
+- `base`: Base URL for font serving
+- `metadata.name`: Name for metadata file (default: `fonts-metadata.json`)
+
+**Returns:** Font fetch instance with methods:
+
+#### `single(name, options?)`
+Download a single font family.
+
+#### `multiple(fonts, options?)`
+Download multiple font families.
+
+#### `all(options?)`
+Download all available Google Fonts.
+
+#### `getFileFromMemory(path)`
+Retrieve a specific file from memory.
+
+#### `getAllFiles()`
+Get all files stored in memory.
+
+#### `clearMemory()`
+Clear all files from memory.
+
+## Font Options
+
+```javascript
+{
+  weight: [400, 700],        // Font weights to download
+  italic: true,              // Include italic variants
+  subset: ['latin'],         // Character subsets
+  css: {
+    write: true,             // Generate CSS files
+    merge: false             // Merge CSS into single file
+  }
+}
+```
 
 ## License
 
