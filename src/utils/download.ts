@@ -11,6 +11,7 @@ const metadataURL = 'https://fonts.google.com/metadata/fonts'
  */
 export async function downloadFont(options: FetchFontOptions): Promise<string> {
   try {
+    console.debug(`🔤 Downloading font from: ${options.url}`)
     const name = normalizeName(options.name)
     const fontPath = `${options.outDir}/${name}`
     await fs.promises.mkdir(fontPath, { recursive: true })
@@ -25,6 +26,7 @@ export async function downloadFont(options: FetchFontOptions): Promise<string> {
 
     const buffer = new Uint8Array(response)
     await fs.promises.writeFile(`${fontPath}/${options.filename}`, buffer)
+    console.debug(`✅ Font saved to memory: ${fontPath}/${options.filename} (${buffer.byteLength} bytes)`)
     return `${options.base}/${name}/${options.filename}`
   }
   catch (e) {
@@ -49,6 +51,7 @@ export async function downloadMetadata(outputPath: string, override = true): Pro
   }
 
   try {
+    console.debug(`📊 Fetching metadata from: ${metadataURL}`)
     const dirname = outputPath.substring(0, outputPath.lastIndexOf('/'))
     await fs.promises.mkdir(dirname, { recursive: true })
     const response = await ofetch(metadataURL)
@@ -57,6 +60,7 @@ export async function downloadMetadata(outputPath: string, override = true): Pro
     }
 
     await fs.promises.writeFile(outputPath, JSON.stringify(response, null, 2), { encoding: 'utf-8' })
+    console.debug(`✅ Metadata saved to memory: ${outputPath}`)
   }
   catch (e) {
     return Promise.reject(e)

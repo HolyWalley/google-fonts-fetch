@@ -9,6 +9,7 @@ import { normalizeName } from './string'
  * @returns {string} The font css content.
  */
 export async function getFontCss(url: string): Promise<string> {
+  console.debug(`📄 Fetching CSS from: ${url}`)
   const response = await ofetch(url, {
     headers: {
       'User-Agent':
@@ -70,6 +71,9 @@ export function parseFontCss(css: string, subsets: Array<string>): Record<string
       const style = fontStyleMatches[1] === 'normal' ? '' : 'i'
       const key = `${weight}${style}`
       const url = parseFontUrl(subsetCss)
+      if (url) {
+        console.debug(`🔍 Found font URL in CSS: ${url} (weight: ${weight}, subset: ${subset})`)
+      }
       if (!content[key]) {
         content[key] = {}
       }

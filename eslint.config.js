@@ -9,7 +9,8 @@ export default antfu(
   },
   {
     rules: {
-      curly: 'off',
+      'curly': 'off',
+      'no-console': 'off',
     },
   },
 )

@@ -18,19 +18,23 @@ This package allows you to download Google Fonts and store them in memory instea
 
 ### From GitHub Release (Recommended)
 
+Check the [releases page](https://github.com/HolyWalley/google-fonts-fetch/releases) for the latest version and install using:
+
 ```bash
-npm install https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+npm install https://github.com/HolyWalley/google-fonts-fetch/releases/download/v[VERSION]/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
 ```
 
 Or with yarn:
 ```bash
-yarn add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+yarn add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v[VERSION]/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
 ```
 
 Or with pnpm:
 ```bash
-pnpm add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v1.0.3/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
+pnpm add https://github.com/HolyWalley/google-fonts-fetch/releases/download/v[VERSION]/frontlabsofficial-google-fonts-fetch-1.0.3.tgz
 ```
+
+Replace `[VERSION]` with the latest version number (e.g., `1.0.4`).
 
 ### From GitHub Repository (Latest)
 
@@ -105,6 +109,29 @@ console.log(Object.keys(allFiles)) // Lists all file paths
 // Clear all fonts from memory
 fontFetch.clearMemory()
 ```
+
+## Debug Logging
+
+To see what URLs are being fetched from Google's servers, enable debug logging:
+
+```javascript
+// Enable debug logging to see all URLs
+console.debug = console.log
+
+const fontFetch = createGoogleFontsFetch({
+  outDir: '/fonts',
+  base: 'dummy'
+})
+
+await fontFetch.single('Inter', { weight: [400, 700] })
+```
+
+This will show:
+- 📄 CSS URLs from Google Fonts API
+- 🔍 Font URLs found in CSS
+- 🔤 Font file downloads from Google's CDN
+- 📊 Metadata fetching
+- ✅ File storage confirmation with sizes
 
 ## Cloudflare Workers Example
 
@@ -212,12 +239,13 @@ To create a new release of this package:
 
 4. **Create a GitHub release** with the tarball:
    ```bash
-   gh release create v1.0.4 frontlabsofficial-google-fonts-fetch-1.0.4.tgz \
-     --title "v1.0.4 - Your Release Title" \
+   gh release create v[NEW_VERSION] frontlabsofficial-google-fonts-fetch-1.0.3.tgz \
+     --title "v[NEW_VERSION] - Your Release Title" \
      --notes "Release notes here"
    ```
+   Replace `[NEW_VERSION]` with the actual version number (e.g., `1.0.5`)
 
-5. **Update installation instructions** in README.md with the new version number
+5. **Users can find the new release** on the [releases page](https://github.com/HolyWalley/google-fonts-fetch/releases)
 
 ### Why This Process?
 
