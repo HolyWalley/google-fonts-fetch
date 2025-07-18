@@ -1,5 +1,4 @@
-import path from 'node:path'
-import fs from 'node:fs/promises'
+import { fs } from 'memfs'
 import { ofetch } from 'ofetch'
 import type { FetchFontsResult, FontContent } from '../types'
 import { normalizeName } from './string'
@@ -93,13 +92,13 @@ export function parseFontCss(css: string, subsets: Array<string>): Record<string
  */
 export async function writeFontCss(name: string, fonts: Record<string, string>, outputPath: string): Promise<void> {
   try {
-    const fontPath = path.join(outputPath, normalizeName(name))
+    const fontPath = `${outputPath}/${normalizeName(name)}`
     const content = Object.keys(fonts).reduce((acc, key) => {
       acc += fonts[key]
       return acc
     }, '')
-    await fs.mkdir(fontPath, { recursive: true })
-    await fs.writeFile(`${fontPath}/style.css`, content, 'utf-8')
+    await fs.promises.mkdir(fontPath, { recursive: true })
+    await fs.promises.writeFile(`${fontPath}/style.css`, content, { encoding: 'utf-8' })
   }
   catch (e) {
     return Promise.reject(e)

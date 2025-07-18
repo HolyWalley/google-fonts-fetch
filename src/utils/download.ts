@@ -1,6 +1,4 @@
-import path from 'node:path'
-import fs from 'node:fs/promises'
-import { Buffer } from 'node:buffer'
+import { fs } from 'memfs'
 import { ofetch } from 'ofetch'
 import type { FetchFontOptions } from '../types'
 import { normalizeName } from './string'
@@ -14,8 +12,8 @@ const metadataURL = 'https://fonts.google.com/metadata/fonts'
 export async function downloadFont(options: FetchFontOptions): Promise<string> {
   try {
     const name = normalizeName(options.name)
-    const fontPath = path.join(options.outDir, name)
-    await fs.mkdir(fontPath, { recursive: true })
+    const fontPath = `${options.outDir}/${name}`
+    await fs.promises.mkdir(fontPath, { recursive: true })
     const response = await ofetch(options.url, {
       responseType: 'arrayBuffer',
       retry: 5,
@@ -25,8 +23,8 @@ export async function downloadFont(options: FetchFontOptions): Promise<string> {
       return Promise.reject(new Error('Not found font'))
     }
 
-    const buffer = Buffer.from(response)
-    await fs.writeFile(`${fontPath}/${options.filename}`, buffer, 'utf-8')
+    const buffer = new Uint8Array(response)
+    await fs.promises.writeFile(`${fontPath}/${options.filename}`, buffer)
     return `${options.base}/${name}/${options.filename}`
   }
   catch (e) {
@@ -42,7 +40,7 @@ export async function downloadFont(options: FetchFontOptions): Promise<string> {
 export async function downloadMetadata(outputPath: string, override = true): Promise<void> {
   if (!override) {
     try {
-      await fs.access(outputPath)
+      await fs.promises.access(outputPath)
       return
     }
     catch (e) {
@@ -51,13 +49,14 @@ export async function downloadMetadata(outputPath: string, override = true): Pro
   }
 
   try {
-    await fs.mkdir(path.dirname(outputPath), { recursive: true })
+    const dirname = outputPath.substring(0, outputPath.lastIndexOf('/'))
+    await fs.promises.mkdir(dirname, { recursive: true })
     const response = await ofetch(metadataURL)
     if (!response) {
       return Promise.reject(new Error('Not found metadata'))
     }
 
-    await fs.writeFile(outputPath, JSON.stringify(response, null, 2), 'utf-8')
+    await fs.promises.writeFile(outputPath, JSON.stringify(response, null, 2), { encoding: 'utf-8' })
   }
   catch (e) {
     return Promise.reject(e)
